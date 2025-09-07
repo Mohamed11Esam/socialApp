@@ -1,0 +1,62 @@
+import nodemailer, { Transporter } from "nodemailer";
+
+interface SendMailParams {
+  to: string;
+  subject: string;
+  html: string;
+}
+
+export async function sendMail({ to, subject, html }: SendMailParams) {
+  let transporter: Transporter | undefined;
+  let testAccount: nodemailer.TestAccount | undefined;
+
+  try {
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // STARTTLS
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+    } else {
+      // Fallback to Ethereal test account for development when credentials are missing
+      testAccount = await nodemailer.createTestAccount();
+      transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+      console.warn(
+        "EMAIL_USER/EMAIL_PASS not set — using Ethereal test account for outgoing mail (development only)"
+      );
+    }
+
+    if (!transporter) throw new Error("No mail transporter available");
+
+    const info = await transporter.sendMail({
+      from: `socialApp <${process.env.EMAIL_USER || (testAccount && testAccount.user)}>`,
+      to,
+      subject,
+      html,
+    });
+
+    // If using Ethereal, log preview URL and return it for tests
+    const preview = nodemailer.getTestMessageUrl(info);
+    if (preview) {
+      console.log("Preview email URL:", preview);
+    }
+
+    return { info, preview };
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("sendMail error:", err);
+    throw err;
+  }
+}

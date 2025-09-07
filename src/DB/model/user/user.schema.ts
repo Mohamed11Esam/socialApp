@@ -1,0 +1,55 @@
+import { Schema } from "mongoose";
+import { IUser } from "./../../../utils/interfaces/index";
+import { USER_AGENT, GENDER, ROLE } from "../../../utils/enums";
+
+export const userSchema = new Schema<IUser>(
+  {
+    firstName: { type: String, minLength: 2, maxLength: 50, trim: true },
+    lastName: { type: String, minLength: 2, maxLength: 50, trim: true },
+    email: { type: String, required: true, unique: true, trim: true },
+    password: {
+      type: String,
+      required: function () {
+        if (this.userAgent == USER_AGENT.GOOGLE) {
+          return false;
+        }
+        return true;
+      },
+      trim: true,
+    },
+    credentialUpdatedAt: { type: Date, default: Date.now },
+    phone: { type: String },
+    role: { type: String, enum: Object.values(ROLE), default: ROLE.USER },
+    gender: { type: String, enum: Object.values(GENDER), default: GENDER.MALE },
+    userAgent: {
+      type: String,
+      enum: Object.values(USER_AGENT),
+      default: USER_AGENT.LOCAL,
+    },
+    otp: { type: String },
+    otpExpiresAt: { type: Date },
+    isVerified: { type: Boolean, default: false },
+    accessToken: { type: String },
+    refreshToken: { type: String },
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    }
+  }
+);
+
+userSchema
+  .virtual("fullName")
+  .get(function () {
+    return `${this.firstName as string} ${this.lastName as string}`;
+  })
+  .set(function (this: IUser, fullName: string) {
+    const [firstName, lastName] = fullName.split(" ");
+    this.firstName = firstName;
+    this.lastName = lastName;
+  });
