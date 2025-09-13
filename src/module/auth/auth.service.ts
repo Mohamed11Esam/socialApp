@@ -1,18 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import { RegisterDto, VerifyOtpDto, LoginDto } from "./auth.dto";
-import { User } from "../../DB/model/user/user.model";
 import {
   ConflictException,
   NotFoundException,
   UnauthorizedException,
 } from "../../utils/errors";
-import { UserRepository } from "../../DB/model/user/user.repository";
+import { UserRepository } from "../../DB";
 import { AuthFactory } from "./factory/index";
-import { sendMail } from "../../utils/email";
-import { generateOtp, generateOtpExpiry } from "../../utils/otp";
-import { compareHash } from "../../utils/hash";
-import { generateToken, TokenBlacklist } from "../../utils/token";
-
+import { sendMail } from "../../utils";
+import { generateOtp, generateOtpExpiry } from "../../utils";
+import { compareHash } from "../../utils";
+import { generateToken } from "../../utils";
 class AuthService {
   // Define your authentication-related methods here
   private userRepository = new UserRepository();
@@ -23,6 +21,7 @@ class AuthService {
 
   async register(req: Request, res: Response, next: NextFunction) {
     const registerDto: RegisterDto = req.body;
+    
     const userExist = await this.userRepository.getOne(
       { email: registerDto.email },
       {},
@@ -31,7 +30,7 @@ class AuthService {
     if (userExist) {
       throw new ConflictException("User already exists");
     }
-    const user = this.authFactory.register(registerDto);
+    const user = await this.authFactory.register(registerDto);
     if (user.email) {
       await sendMail({
         to: user.email,

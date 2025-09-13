@@ -10,16 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const errors_1 = require("../../utils/errors");
-const user_repository_1 = require("../../DB/model/user/user.repository");
+const DB_1 = require("../../DB");
 const index_1 = require("./factory/index");
-const email_1 = require("../../utils/email");
-const otp_1 = require("../../utils/otp");
-const hash_1 = require("../../utils/hash");
-const token_1 = require("../../utils/token");
+const utils_1 = require("../../utils");
+const utils_2 = require("../../utils");
+const utils_3 = require("../../utils");
+const utils_4 = require("../../utils");
 class AuthService {
     constructor() {
         // Define your authentication-related methods here
-        this.userRepository = new user_repository_1.UserRepository();
+        this.userRepository = new DB_1.UserRepository();
         this.authFactory = new index_1.AuthFactory();
         // Initialize any required dependencies here
     }
@@ -32,7 +32,7 @@ class AuthService {
             }
             const user = this.authFactory.register(registerDto);
             if (user.email) {
-                yield (0, email_1.sendMail)({
+                yield (0, utils_1.sendMail)({
                     to: user.email,
                     subject: "Verification Email",
                     html: `<p>Your verification code is: <strong>${user.otp}</strong></p>`,
@@ -88,11 +88,11 @@ class AuthService {
                     .status(200)
                     .json({ message: "User already verified", success: true });
             }
-            const otp = (0, otp_1.generateOtp)();
-            const otpExpiresAt = (0, otp_1.generateOtpExpiry)(10); // 10 minutes
+            const otp = (0, utils_2.generateOtp)();
+            const otpExpiresAt = (0, utils_2.generateOtpExpiry)(10); // 10 minutes
             yield this.userRepository.update({ email }, { otp, otpExpiresAt });
             if (email) {
-                yield (0, email_1.sendMail)({
+                yield (0, utils_1.sendMail)({
                     to: email,
                     subject: "Your OTP code",
                     html: `<p>Your new verification code is: <strong>${otp}</strong></p>`,
@@ -125,14 +125,14 @@ class AuthService {
             if (!userExists) {
                 return res.status(404).json({ error: "User not found", success: false });
             }
-            const isMatch = (0, hash_1.compareHash)(loginDto.password, userExists.password);
+            const isMatch = (0, utils_3.compareHash)(loginDto.password, userExists.password);
             if (!isMatch) {
                 return res
                     .status(401)
                     .json({ error: "Invalid credentials", success: false });
             }
-            const accessToken = (0, token_1.generateToken)(userExists._id, "1h");
-            const refreshToken = (0, token_1.generateToken)(userExists._id, "7d");
+            const accessToken = (0, utils_4.generateToken)(userExists._id, "1h");
+            const refreshToken = (0, utils_4.generateToken)(userExists._id, "7d");
             const payload = this.authFactory.loginResponse(userExists, accessToken, refreshToken);
             return res.status(200).json({
                 message: "Login successful",

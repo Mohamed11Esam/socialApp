@@ -6,10 +6,10 @@ import { LoginDto } from "../auth.dto";
 import { User } from "../entity";
 
 export class AuthFactory {
-    register(data: RegisterDto): User {
+   async register(data: RegisterDto) {
         const user = new User();
         user.email = data.email as string;
-        user.password = generateHash(data.password as string);
+        user.password = await generateHash(data.password as string);
         user.role = ROLE.USER;
         user.gender = data.gender as GENDER;
         user.userAgent = USER_AGENT.LOCAL;

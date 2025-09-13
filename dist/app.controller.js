@@ -1,16 +1,14 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = bootstrap;
-const auth_controller_1 = __importDefault(require("./module/auth/auth.controller"));
 const errors_1 = require("./utils/errors");
-const connection_1 = require("./DB/connection");
+const DB_1 = require("./DB");
+const module_1 = require("./module");
 function bootstrap(app, express) {
     app.use(express.json());
-    (0, connection_1.connectDB)();
-    app.use("/auth", auth_controller_1.default);
+    (0, DB_1.connectDB)();
+    app.use("/auth", module_1.authRouter);
+    app.use("/user", module_1.userRouter);
     app.use("/{*dummy}", (req, res, next) => {
         res.status(404).json({ message: "Not Found", success: false });
     });

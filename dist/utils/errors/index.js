@@ -1,33 +1,40 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.asyncHandler = exports.UnauthorizedException = exports.NotFoundException = exports.ConflictException = exports.AppError = void 0;
+exports.asyncHandler = exports.badRequestException = exports.UnauthorizedException = exports.NotFoundException = exports.ConflictException = exports.AppError = void 0;
 exports.jsonErrorHandler = jsonErrorHandler;
 class AppError extends Error {
-    constructor(message, statusCode) {
+    constructor(message, statusCode, details) {
         super(message);
         this.statusCode = statusCode;
+        this.details = details;
         this.name = "AppError";
     }
 }
 exports.AppError = AppError;
 class ConflictException extends AppError {
-    constructor(message) {
-        super(message, 409);
+    constructor(message, details) {
+        super(message, 409, details);
     }
 }
 exports.ConflictException = ConflictException;
 class NotFoundException extends AppError {
-    constructor(message) {
-        super(message, 404);
+    constructor(message, details) {
+        super(message, 404, details);
     }
 }
 exports.NotFoundException = NotFoundException;
 class UnauthorizedException extends AppError {
-    constructor(message) {
-        super(message, 401);
+    constructor(message, details) {
+        super(message, 401, details);
     }
 }
 exports.UnauthorizedException = UnauthorizedException;
+class badRequestException extends AppError {
+    constructor(message, details) {
+        super(message, 400, details);
+    }
+}
+exports.badRequestException = badRequestException;
 // simple async wrapper to forward errors to express error handler
 const asyncHandler = (fn) => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
@@ -46,6 +53,7 @@ function jsonErrorHandler(err, _req, res, _next) {
             message,
             statusCode: status,
             stack,
+            details: isApp ? err.details : undefined
         },
     });
 }

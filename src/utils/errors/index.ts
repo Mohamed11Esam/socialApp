@@ -1,26 +1,34 @@
+import { de } from "zod/v4/locales";
+
 export class AppError extends Error {
-  constructor(message: string, public statusCode: number) {
+  constructor(message: string, public statusCode: number, public details?: Record<string, any>) {
     super(message);
     this.name = "AppError";
   }
 }
 
 export class ConflictException extends AppError {
-  constructor(message: string) {
-    super(message, 409);
+  constructor(message: string, details?: Record<string, any>) {
+    super(message, 409, details);
   }
 }
 
 export class NotFoundException extends AppError {
-  constructor(message: string) {
-    super(message, 404);
+  constructor(message: string, details?: Record<string, any>) {
+    super(message, 404, details);
   }
 }
 
 export class UnauthorizedException extends AppError {
-  constructor(message: string) {
-    super(message, 401);
+  constructor(message: string, details?: Record<string, any>) {
+    super(message, 401, details);
   }
+}
+export class badRequestException extends AppError {
+  constructor(message: string, details?: Record<string, any>) {
+    super(message, 400, details);
+  }
+
 }
 
 // simple async wrapper to forward errors to express error handler
@@ -43,6 +51,7 @@ export function jsonErrorHandler(err: any, _req: any, res: any, _next: any) {
       message,
       statusCode: status,
       stack,
+      details: isApp ? err.details : undefined
     },
   });
 }
