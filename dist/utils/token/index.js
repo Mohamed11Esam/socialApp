@@ -38,7 +38,8 @@ exports.generateToken = generateToken;
 exports.verifyToken = verifyToken;
 const jwt = __importStar(require("jsonwebtoken"));
 const mongoose_1 = require("mongoose");
-const JWT_SECRET = process.env.JWT_SECRET || "change_this_secret";
+const dev_config_1 = require("../../config/env/dev.config");
+const JWT_SECRET = dev_config_1.devConfig.JWT_SECRET || "change_this_secret";
 function generateToken(userId, expiresIn) {
     return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn });
 }

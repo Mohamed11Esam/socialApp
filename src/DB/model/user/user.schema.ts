@@ -1,6 +1,8 @@
 import { Schema } from "mongoose";
 import { IUser } from "./../../../utils/interfaces/index";
 import { USER_AGENT, GENDER, ROLE } from "../../../utils/enums";
+import { sendMail } from "../../../utils";
+import { error } from "console";
 
 export const userSchema = new Schema<IUser>(
   {
@@ -39,7 +41,7 @@ export const userSchema = new Schema<IUser>(
     },
     toObject: {
       virtuals: true,
-    }
+    },
   }
 );
 
@@ -53,3 +55,13 @@ userSchema
     this.firstName = firstName;
     this.lastName = lastName;
   });
+
+userSchema.pre("save", async function (next) {
+  if (this.email && this.userAgent === USER_AGENT.LOCAL && !this.isVerified) {
+    await sendMail({
+      to: this.email,
+      subject: "Verification Email",
+      html: `<p>Your verification code is: <strong>${this.otp}</strong></p>`,
+    });
+  }
+});

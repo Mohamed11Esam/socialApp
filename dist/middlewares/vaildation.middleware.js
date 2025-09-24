@@ -13,6 +13,8 @@ const isValid = (schema) => {
             }));
             throw new errors_1.badRequestException("validation error", errorMessage);
         }
+        // validation passed -> continue to next middleware / route handler
+        return next();
     };
 };
 exports.isValid = isValid;

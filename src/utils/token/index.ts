@@ -1,7 +1,8 @@
 import * as jwt from "jsonwebtoken";
 import { model, Schema } from "mongoose";
+import { devConfig } from "../../config/env/dev.config";
 
-const JWT_SECRET: jwt.Secret = process.env.JWT_SECRET || "change_this_secret";
+const JWT_SECRET: jwt.Secret = devConfig.JWT_SECRET || "change_this_secret";
 
 export function generateToken(userId: any, expiresIn: string) {
   return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn });

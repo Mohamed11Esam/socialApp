@@ -1,4 +1,5 @@
 import nodemailer, { Transporter } from "nodemailer";
+import { devConfig } from "../../config/env/dev.config";
 
 interface SendMailParams {
   to: string;
@@ -11,14 +12,14 @@ export async function sendMail({ to, subject, html }: SendMailParams) {
   let testAccount: nodemailer.TestAccount | undefined;
 
   try {
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    if (devConfig.EMAIL_USER && devConfig.EMAIL_PASS) {
       transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
         secure: false, // STARTTLS
         auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
+          user: devConfig.EMAIL_USER,
+          pass: devConfig.EMAIL_PASS,
         },
       });
     } else {
@@ -41,7 +42,9 @@ export async function sendMail({ to, subject, html }: SendMailParams) {
     if (!transporter) throw new Error("No mail transporter available");
 
     const info = await transporter.sendMail({
-      from: `socialApp <${process.env.EMAIL_USER || (testAccount && testAccount.user)}>`,
+      from: `socialApp <${
+        devConfig.EMAIL_USER || (testAccount && testAccount.user)
+      }>`,
       to,
       subject,
       html,

@@ -30,14 +30,7 @@ class AuthService {
             if (userExist) {
                 throw new errors_1.ConflictException("User already exists");
             }
-            const user = this.authFactory.register(registerDto);
-            if (user.email) {
-                yield (0, utils_1.sendMail)({
-                    to: user.email,
-                    subject: "Verification Email",
-                    html: `<p>Your verification code is: <strong>${user.otp}</strong></p>`,
-                });
-            }
+            const user = yield this.authFactory.register(registerDto);
             const savedUser = yield this.userRepository.create(user);
             return res.status(201).json({
                 message: "User registered successfully",

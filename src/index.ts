@@ -1,9 +1,9 @@
-import { config } from "dotenv";
 import express from "express";
 import bootstrap from "./app.controller";
-config({ path: "./config/dev.env" });
+import { devConfig } from "./config/env/dev.config";
+
 const app = express();
-const PORT = process.env.PORT;
+const PORT = devConfig.PORT;
 bootstrap(app, express);
 app.get("/", (_req, res) => {
   res.send("Hello from socialApp");

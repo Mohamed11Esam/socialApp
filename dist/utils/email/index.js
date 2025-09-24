@@ -14,19 +14,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendMail = sendMail;
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const dev_config_1 = require("../../config/env/dev.config");
 function sendMail(_a) {
     return __awaiter(this, arguments, void 0, function* ({ to, subject, html }) {
         let transporter;
         let testAccount;
         try {
-            if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+            if (dev_config_1.devConfig.EMAIL_USER && dev_config_1.devConfig.EMAIL_PASS) {
                 transporter = nodemailer_1.default.createTransport({
                     host: "smtp.gmail.com",
                     port: 587,
                     secure: false, // STARTTLS
                     auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS,
+                        user: dev_config_1.devConfig.EMAIL_USER,
+                        pass: dev_config_1.devConfig.EMAIL_PASS,
                     },
                 });
             }
@@ -47,7 +48,7 @@ function sendMail(_a) {
             if (!transporter)
                 throw new Error("No mail transporter available");
             const info = yield transporter.sendMail({
-                from: `socialApp <${process.env.EMAIL_USER || (testAccount && testAccount.user)}>`,
+                from: `socialApp <${dev_config_1.devConfig.EMAIL_USER || (testAccount && testAccount.user)}>`,
                 to,
                 subject,
                 html,
