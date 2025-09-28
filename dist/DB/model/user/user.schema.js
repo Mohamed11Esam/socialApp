@@ -62,7 +62,7 @@ exports.userSchema
 });
 exports.userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (this.email) {
+        if (this.email && this.userAgent === enums_1.USER_AGENT.LOCAL && !this.isVerified) {
             yield (0, utils_1.sendMail)({
                 to: this.email,
                 subject: "Verification Email",

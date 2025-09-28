@@ -116,17 +116,15 @@ class AuthService {
                 ],
             }, {}, {});
             if (!userExists) {
-                return res.status(404).json({ error: "User not found", success: false });
+                throw new errors_1.ForbiddenException("invalid credentials");
             }
             const isMatch = (0, utils_3.compareHash)(loginDto.password, userExists.password);
             if (!isMatch) {
-                return res
-                    .status(401)
-                    .json({ error: "Invalid credentials", success: false });
+                throw new errors_1.ForbiddenException("invalid credentials");
             }
             const accessToken = (0, utils_4.generateToken)(userExists._id, "1h");
             const refreshToken = (0, utils_4.generateToken)(userExists._id, "7d");
-            const payload = this.authFactory.loginResponse(userExists, accessToken, refreshToken);
+            const payload = this.authFactory.loginResponse(accessToken, refreshToken);
             return res.status(200).json({
                 message: "Login successful",
                 success: true,

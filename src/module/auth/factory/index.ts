@@ -2,7 +2,6 @@ import { GENDER, ROLE, USER_AGENT } from "../../../utils/enums";
 import { generateHash } from "../../../utils/hash";
 import { generateOtp, generateOtpExpiry } from "../../../utils/otp";
 import { RegisterDto } from "../auth.dto";
-import { LoginDto } from "../auth.dto";
 import { User } from "../entity";
 
 export class AuthFactory {
@@ -19,9 +18,8 @@ export class AuthFactory {
 
     }
 
-    loginResponse(user: User, accessToken: string, refreshToken: string) {
+    loginResponse(accessToken: string, refreshToken: string) {
         return {
-            user,
             accessToken,
             refreshToken
         };

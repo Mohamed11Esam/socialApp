@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { RegisterDto, VerifyOtpDto, LoginDto } from "./auth.dto";
 import {
   ConflictException,
+  ForbiddenException,
   NotFoundException,
   UnauthorizedException,
 } from "../../utils/errors";
@@ -140,21 +141,19 @@ class AuthService {
     );
 
     if (!userExists) {
-      return res.status(404).json({ error: "User not found", success: false });
+      throw new ForbiddenException("invalid credentials");
     }
 
     const isMatch = compareHash(loginDto.password, userExists.password as string);
     if (!isMatch) {
-      return res
-        .status(401)
-        .json({ error: "Invalid credentials", success: false });
+      throw new ForbiddenException("invalid credentials");
     }
 
     const accessToken = generateToken(userExists._id, "1h");
     const refreshToken = generateToken(userExists._id, "7d");
 
 
-    const payload = this.authFactory.loginResponse(userExists as any, accessToken, refreshToken);
+    const payload = this.authFactory.loginResponse(accessToken, refreshToken);
 
     return res.status(200).json({
       message: "Login successful",

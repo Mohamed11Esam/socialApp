@@ -11,6 +11,7 @@ const auth_validation_1 = require("./auth.validation");
 const router = (0, express_1.Router)();
 // bind and wrap so `this` is preserved and errors are forwarded to the JSON error handler
 router.post("/register", (0, vaildation_middleware_1.isValid)(auth_validation_1.registerSchema), (0, utils_1.asyncHandler)(auth_service_1.default.register.bind(auth_service_1.default)));
-router.post("/verify-otp", (0, utils_1.asyncHandler)(auth_service_1.default.verifyOtp.bind(auth_service_1.default)));
-router.post("/login", (0, utils_1.asyncHandler)(auth_service_1.default.login.bind(auth_service_1.default)));
+router.post("/verify-otp", (0, vaildation_middleware_1.isValid)(auth_validation_1.verifyOtpSchema), (0, utils_1.asyncHandler)(auth_service_1.default.verifyOtp.bind(auth_service_1.default)));
+router.post("/login", (0, vaildation_middleware_1.isValid)(auth_validation_1.loginSchema), (0, utils_1.asyncHandler)(auth_service_1.default.login.bind(auth_service_1.default)));
+router.post("/resend-otp", (0, vaildation_middleware_1.isValid)(auth_validation_1.resendOtpSchema), (0, utils_1.asyncHandler)(auth_service_1.default.resendOtp.bind(auth_service_1.default)));
 exports.default = router;

@@ -28,9 +28,8 @@ class AuthFactory {
             return user;
         });
     }
-    loginResponse(user, accessToken, refreshToken) {
+    loginResponse(accessToken, refreshToken) {
         return {
-            user,
             accessToken,
             refreshToken
         };

@@ -9,6 +9,7 @@ function bootstrap(app, express) {
     (0, DB_1.connectDB)();
     app.use("/auth", module_1.authRouter);
     app.use("/user", module_1.userRouter);
+    app.use("/post", module_1.postRouter);
     app.use("/{*dummy}", (req, res, next) => {
         res.status(404).json({ message: "Not Found", success: false });
     });

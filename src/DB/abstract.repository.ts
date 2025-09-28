@@ -12,7 +12,7 @@ export abstract class AbstractRepository<T> {
     return await doc.save();
   }
 
-  async getOne(filter: RootFilterQuery<T>,projection:ProjectionType<T>,Options:QueryOptions<T>) {
+  async getOne(filter: RootFilterQuery<T>,projection?:ProjectionType<T>,Options?:QueryOptions<T>) {
     return this.model.findOne(filter,projection,Options).exec();
   }
   async update(filter: RootFilterQuery<T>, data: Partial<T>) {

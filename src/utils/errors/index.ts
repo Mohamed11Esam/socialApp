@@ -24,6 +24,13 @@ export class UnauthorizedException extends AppError {
     super(message, 401, details);
   }
 }
+
+export class ForbiddenException extends AppError {
+  constructor(message: string, details?: Record<string, any>) {
+    super(message, 403, details);
+  }
+}
+
 export class badRequestException extends AppError {
   constructor(message: string, details?: Record<string, any>) {
     super(message, 400, details);

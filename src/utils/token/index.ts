@@ -1,25 +1,15 @@
-import * as jwt from "jsonwebtoken";
-import { model, Schema } from "mongoose";
+import { sign, verify, SignOptions } from "jsonwebtoken";
 import { devConfig } from "../../config/env/dev.config";
+import { Ipayload } from "../interfaces";
 
-const JWT_SECRET: jwt.Secret = devConfig.JWT_SECRET || "change_this_secret";
+const JWT_SECRET = (devConfig.JWT_SECRET as string) || "change_this_secret";
 
-export function generateToken(userId: any, expiresIn: string) {
-  return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn });
+export function generateToken(userId: any, expiresIn: string): string {
+  return sign({ sub: userId }, JWT_SECRET, { expiresIn } as SignOptions);
 }
 
 export function verifyToken(token: string) {
-  return jwt.verify(token, JWT_SECRET);
+  return verify(token, JWT_SECRET) as Ipayload;
 }
 
 // simple TokenBlacklist model to store refresh tokens (or revoked tokens)
-const tokenSchema = new Schema(
-  {
-    token: { type: String, required: true },
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    type: { type: String },
-  },
-  { timestamps: true }
-);
-
-export const TokenBlacklist = model("TokenBlacklist", tokenSchema);
