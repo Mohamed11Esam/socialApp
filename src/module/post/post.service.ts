@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
-import { PostRepository } from "../../DB/model/post/post.repository";
-import { NotFoundException } from "../../utils";
+import { PostRepository } from "../../DB";
+import { NotFoundException, REACTIONS } from "../../utils";
 
 class PostService {
     private readonly postFactoryService = new PostFactoryService();
@@ -27,21 +27,35 @@ class PostService {
             return reaction.userId.toString() === userId.toString();
         });
         // If user already reacted -> update the existing reaction entry
-        if (userReactedIndex !== -1) {
+        if (userReactedIndex == -1) {
+            
+            await this.postRepository.update(
+            { _id: id },
+            { $push: { reactions: { reaction:[null,undefined,""].includes(reaction) ? REACTIONS.LIKE : reaction, userId } } } as any
+            );
+            return res.sendStatus(204);
+        }
+        else if ([undefined,null,""].includes(reaction)){ {
+           await this.postRepository.update(
+                { _id: id },
+                { $pull: { reactions: postExists.reactions[userReactedIndex] } } as any
+            );
+            return res.sendStatus(204);
+        }
+        }
+        else{
             await this.postRepository.update(
                 { _id: id, "reactions.userId": userId },
                 { $set: { "reactions.$.reaction": reaction } } as any
             );
-            return res.sendStatus(204);
+            ;
         }
         // User hasn't reacted yet -> push a new reaction
-        await this.postRepository.update(
-            { _id: id },
-            { $push: { reactions: { reaction, userId } } } as any
-        );
+        
         return res.sendStatus(204);
         
     }
+
 }
 
 
