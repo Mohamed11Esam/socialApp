@@ -6,10 +6,10 @@ export const registerSchema = z.object<RegisterDto>({
   fullName: z
     .string()
     .min(2, "Full name must be at least 2 characters long")
-    .max(
-      100,
-      "Full name must be at most 100 characters long"
-    ) as unknown as string,
+    .max(100, "Full name must be at most 100 characters long")
+    .refine((name) => name.trim().length > 0, {
+      message: "Full name cannot be empty",
+    }) as unknown as string,
   email: z.email("Invalid email address") as unknown as string,
   password: z
     .string()

@@ -6,8 +6,20 @@ import { error } from "console";
 
 export const userSchema = new Schema<IUser>(
   {
-    firstName: { type: String, minLength: 2, maxLength: 50, trim: true },
-    lastName: { type: String, minLength: 2, maxLength: 50, trim: true },
+    firstName: {
+      type: String,
+      required: true,
+      minLength: 2,
+      maxLength: 50,
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+      minLength: 2,
+      maxLength: 50,
+      trim: true,
+    },
     email: { type: String, required: true, unique: true, trim: true },
     password: {
       type: String,

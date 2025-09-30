@@ -13,4 +13,5 @@ router.patch(
   isValidParams(getPostParamsSchema),
   postService.addReaction
 );
+router.get("/:id", isAuthenticated, postService.getSpecificPost);
 export default router;
