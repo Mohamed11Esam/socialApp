@@ -16,5 +16,10 @@ export const postSchema = new Schema<IPost>({
 },
     reactions: [reactionSchema],
     attachments: [{ type: Schema.Types.ObjectId, ref: "Attachment" }],
-    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
-},{ timestamps: true });
+},{ timestamps: true  , toJSON: { virtuals: true }, toObject: { virtuals: true }});
+
+postSchema.virtual('comments', {
+    localField: '_id',
+    foreignField: 'postId',
+    ref: 'Comment'
+});

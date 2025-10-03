@@ -36,6 +36,7 @@ export interface IReaction{
     reaction:REACTIONS; // e.g., 'like', 'love', etc.
 }
 export interface IPost{
+    _id: ObjectId;
     userId: ObjectId;
     content: string;
     reactions: IReaction[];
@@ -43,6 +44,7 @@ export interface IPost{
     comments?: IComment[];
 }
 export interface IComment{
+    _id:ObjectId;
     user: IUser;
     content: string;    
     author: IUser;
@@ -54,4 +56,14 @@ export interface IComment{
 export interface IAttachment{
     url: string;
     id:string;
+}
+
+export interface IComment{
+    userId: ObjectId;
+    postId: ObjectId;
+    parentIds : ObjectId[];
+    content: string;
+    attachments?: IAttachment[];
+    mentions?: ObjectId[];
+    reactions?: IReaction[];
 }
