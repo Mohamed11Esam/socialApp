@@ -3,7 +3,11 @@ import { isAuthenticated } from "../../middlewares/auth.middleware";
 import postService from "./post.service";
 import { isValidParams } from "../../middlewares/param-validation.middleware";
 import { isValid } from "../../middlewares/vaildation.middleware";
-import { getPostParamsSchema, createPostSchema, reactionSchema } from "./post.validation";
+import {
+  getPostParamsSchema,
+  createPostSchema,
+  reactionSchema,
+} from "./post.validation";
 import commentRouter from "../comment/comment.controller";
 
 const router = Router();
@@ -32,5 +36,5 @@ router.delete(
   isAuthenticated,
   isValidParams(getPostParamsSchema),
   postService.deletePost
-);  
+);
 export default router;

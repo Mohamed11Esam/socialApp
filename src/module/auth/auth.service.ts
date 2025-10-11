@@ -23,7 +23,7 @@ class AuthService {
 
   async register(req: Request, res: Response, next: NextFunction) {
     const registerDto: RegisterDto = req.body;
-    
+
     const userExist = await this.userRepository.getOne(
       { email: registerDto.email },
       {},
@@ -33,7 +33,7 @@ class AuthService {
       throw new ConflictException("User already exists");
     }
     const user = await this.authFactory.register(registerDto);
-    
+
     const savedUser = await this.userRepository.create(user);
     return res.status(201).json({
       message: "User registered successfully",
@@ -145,7 +145,10 @@ class AuthService {
       throw new ForbiddenException("invalid credentials");
     }
 
-    const isMatch = compareHash(loginDto.password, userExists.password as string);
+    const isMatch = compareHash(
+      loginDto.password,
+      userExists.password as string
+    );
     if (!isMatch) {
       throw new ForbiddenException("invalid credentials");
     }
@@ -154,7 +157,10 @@ class AuthService {
     if (userExists.twoFactorEnabled) {
       const otp = generateOtp();
       const otpExpiresAt = generateOtpExpiry(10);
-      await this.userRepository.update({ _id: userExists._id }, { otp, otpExpiresAt });
+      await this.userRepository.update(
+        { _id: userExists._id },
+        { otp, otpExpiresAt }
+      );
       // send mail
       if (userExists.email) {
         await sendMail({
@@ -169,7 +175,6 @@ class AuthService {
     const accessToken = generateToken(userExists._id, "1h");
     const refreshToken = generateToken(userExists._id, "7d");
 
-
     const payload = this.authFactory.loginResponse(accessToken, refreshToken);
 
     return res.status(200).json({
@@ -180,7 +185,10 @@ class AuthService {
   }
 
   async changePassword(req: Request, res: Response, next: NextFunction) {
-    const { currentPassword, newPassword } = req.body as { currentPassword: string; newPassword: string };
+    const { currentPassword, newPassword } = req.body as {
+      currentPassword: string;
+      newPassword: string;
+    };
     const userId = req.user && req.user._id;
     if (!userId) {
       throw new UnauthorizedException("User not authenticated");
@@ -199,7 +207,9 @@ class AuthService {
     const hashed = await generateHash(newPassword);
     await this.userRepository.update({ _id: userId }, { password: hashed });
 
-    return res.status(200).json({ message: "Password changed successfully", success: true });
+    return res
+      .status(200)
+      .json({ message: "Password changed successfully", success: true });
   }
 
   async verifyLoginOtp(req: Request, res: Response, next: NextFunction) {
@@ -216,11 +226,16 @@ class AuthService {
     }
 
     // clear otp and issue tokens
-    await this.userRepository.update({ _id: user._id }, { otp: null as any, otpExpiresAt: null as any });
+    await this.userRepository.update(
+      { _id: user._id },
+      { otp: null as any, otpExpiresAt: null as any }
+    );
     const accessToken = generateToken(user._id, "1h");
     const refreshToken = generateToken(user._id, "7d");
     const payload = this.authFactory.loginResponse(accessToken, refreshToken);
-    return res.status(200).json({ message: "Login successful", success: true, data: payload });
+    return res
+      .status(200)
+      .json({ message: "Login successful", success: true, data: payload });
   }
 }
 

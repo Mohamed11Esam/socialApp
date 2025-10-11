@@ -43,14 +43,19 @@ export async function sendMail({ to, subject, html }: SendMailParams) {
     if (!transporter) throw new Error("No mail transporter available");
 
     const mailOptions: any = {
-      from: `socialApp <${devConfig.EMAIL_USER || (testAccount && testAccount.user)}>`,
+      from: `socialApp <${
+        devConfig.EMAIL_USER || (testAccount && testAccount.user)
+      }>`,
       to,
       subject,
       html,
     };
 
     // If tags are provided, include them as a header so downstream systems (SES/Mailgun/etc.) can consume
-    if ((arguments[0] as SendMailParams).tags && (arguments[0] as SendMailParams).tags!.length) {
+    if (
+      (arguments[0] as SendMailParams).tags &&
+      (arguments[0] as SendMailParams).tags!.length
+    ) {
       mailOptions.headers = {
         ...(mailOptions.headers || {}),
         "X-Tags": (arguments[0] as SendMailParams).tags!.join(","),

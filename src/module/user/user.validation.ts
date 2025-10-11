@@ -20,5 +20,7 @@ export const toggle2FASchema = z.object({
 
 export const changeEmailSchema = z.object({
   newEmail: z.string().email("Invalid email address"),
-  currentPassword: z.string().min(6, "Current password must be at least 6 characters"),
+  currentPassword: z
+    .string()
+    .min(6, "Current password must be at least 6 characters"),
 });
