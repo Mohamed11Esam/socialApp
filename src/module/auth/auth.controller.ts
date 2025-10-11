@@ -1,12 +1,15 @@
 import { Router } from "express";
 import authService from "./auth.service";
 import { asyncHandler } from "../../utils";
+import { isAuthenticated } from "../../middlewares/auth.middleware";
 import { isValid } from "../../middlewares/vaildation.middleware";
 import {
   registerSchema,
   verifyOtpSchema,
   loginSchema,
   resendOtpSchema,
+  changePasswordSchema,
+  verifyLoginOtpSchema,
 } from "./auth.validation";
 
 const router = Router();
@@ -30,6 +33,21 @@ router.post(
   "/resend-otp",
   isValid(resendOtpSchema),
   asyncHandler(authService.resendOtp.bind(authService))
+);
+
+router.patch(
+  "/change-password",
+  // requires authentication
+  isAuthenticated,
+  // validate body
+  isValid(changePasswordSchema),
+  asyncHandler(authService.changePassword.bind(authService))
+);
+
+router.post(
+  "/verify-login-otp",
+  isValid(verifyLoginOtpSchema),
+  asyncHandler(authService.verifyLoginOtp.bind(authService))
 );
 
 export default router;

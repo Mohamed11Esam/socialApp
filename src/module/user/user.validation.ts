@@ -6,3 +6,19 @@ export const getUserProfileSchema = z.object({
     .min(1, "User ID is required")
     .regex(/^[0-9a-fA-F]{24}$/, "Invalid user ID format"),
 });
+
+export const updateProfileSchema = z.object({
+  fullName: z.string().min(2).max(100).optional(),
+  phone: z.string().optional(),
+  gender: z.string().optional(),
+});
+
+export const toggle2FASchema = z.object({
+  enable: z.boolean(),
+  password: z.string().optional(),
+});
+
+export const changeEmailSchema = z.object({
+  newEmail: z.string().email("Invalid email address"),
+  currentPassword: z.string().min(6, "Current password must be at least 6 characters"),
+});

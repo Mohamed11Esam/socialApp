@@ -7,7 +7,7 @@ export const CommentSchema = new Schema<IComment>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     postId: { type: Schema.Types.ObjectId, ref: "Post", required: true },
-    parentIds: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+    parentId: { type: Schema.Types.ObjectId, ref: "Comment" },
     content: { type: String, required: function() {
        if (!this.attachments || this.attachments.length === 0) {
          return true; // content is required if there are no attachments
@@ -19,5 +19,23 @@ export const CommentSchema = new Schema<IComment>(
     mentions: [{ type: Schema.Types.ObjectId, ref: "User" }],
     reactions: [reactionSchema],
   },
-  { timestamps: true }
+  { timestamps: true ,toJSON: { virtuals: true }, toObject: { virtuals: true }}
 );
+
+CommentSchema.virtual('replaies', {
+  ref: 'Comment',
+  localField: '_id',
+  foreignField: 'parentId'
+});
+ 
+CommentSchema.pre('deleteOne', async function(next) {
+  const ctx: any = this;
+  const filter = typeof ctx.getFilter === 'function' ? ctx.getFilter() : {};
+  const replies = await ctx.model.find({ parentId: filter._id });
+  if (replies.length) {
+    for (const reply of replies) {
+      await ctx.model.deleteOne({ _id: reply._id });
+    }
+  }
+  next();
+});

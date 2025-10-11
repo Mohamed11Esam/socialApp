@@ -5,6 +5,7 @@ interface SendMailParams {
   to: string;
   subject: string;
   html: string;
+  tags?: string[];
 }
 
 export async function sendMail({ to, subject, html }: SendMailParams) {
@@ -41,14 +42,22 @@ export async function sendMail({ to, subject, html }: SendMailParams) {
 
     if (!transporter) throw new Error("No mail transporter available");
 
-    const info = await transporter.sendMail({
-      from: `socialApp <${
-        devConfig.EMAIL_USER || (testAccount && testAccount.user)
-      }>`,
+    const mailOptions: any = {
+      from: `socialApp <${devConfig.EMAIL_USER || (testAccount && testAccount.user)}>`,
       to,
       subject,
       html,
-    });
+    };
+
+    // If tags are provided, include them as a header so downstream systems (SES/Mailgun/etc.) can consume
+    if ((arguments[0] as SendMailParams).tags && (arguments[0] as SendMailParams).tags!.length) {
+      mailOptions.headers = {
+        ...(mailOptions.headers || {}),
+        "X-Tags": (arguments[0] as SendMailParams).tags!.join(","),
+      };
+    }
+
+    const info = await transporter.sendMail(mailOptions);
 
     // If using Ethereal, log preview URL and return it for tests
     const preview = nodemailer.getTestMessageUrl(info);

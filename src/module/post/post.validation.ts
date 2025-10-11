@@ -18,3 +18,8 @@ export const createPostSchema = z
       (data.attachments && data.attachments.length > 0),
     { message: "Either content or attachments is required" }
   );
+
+// Reaction body validation: allow empty/undefined to mean remove reaction, or a non-empty string
+export const reactionSchema = z.object({
+  reaction: z.string().optional(),
+});

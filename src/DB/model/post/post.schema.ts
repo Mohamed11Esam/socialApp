@@ -23,3 +23,17 @@ postSchema.virtual('comments', {
     foreignField: 'postId',
     ref: 'Comment'
 });
+
+postSchema.pre('deleteOne' , async function(next){
+    const ctx:any = this;
+    const filter = typeof ctx.getFilter === 'function' ? ctx.getFilter() : ctx._conditions;
+    // const firstLayerOfComments = await ctx.model.db.model('Comment').find({ postId: filter._id, parentId: null });
+    // if(firstLayerOfComments.length){
+    //     for(const comment of firstLayerOfComments){
+    //         await ctx.model.db.model('Comment').deleteOne({ parentId: comment._id });
+    //     }
+    // }
+    // next();
+    await ctx.model.db.model('Comment').deleteMany({ postId: filter._id });
+    next();
+});

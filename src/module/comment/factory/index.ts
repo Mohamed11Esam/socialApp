@@ -8,8 +8,8 @@ export class CommentFactoryService {
         const newComment = new Comment();
         newComment.content = CreateCommentDto.content;
         newComment.userId = user._id;
-        newComment.postId = postId._id;
-        newComment.parentIds = comment ? [...comment.parentIds, comment._id] : [];
+        newComment.postId = postId._id || comment?.postId;
+        newComment.parentId = comment ? comment._id : null;
         newComment.attachments = CreateCommentDto.attatchments;
         newComment.mentions = [];
         newComment.reactions = [];// Will be set by the database

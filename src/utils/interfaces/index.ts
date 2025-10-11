@@ -16,6 +16,7 @@ export interface IUser{
     userAgent: USER_AGENT;
     otp?: string;
     otpExpiresAt?: Date;
+    twoFactorEnabled?: boolean;
     isVerified?: boolean;
     accessToken?: string;
     refreshToken?: string;
@@ -61,7 +62,7 @@ export interface IAttachment{
 export interface IComment{
     userId: ObjectId;
     postId: ObjectId;
-    parentIds : ObjectId[];
+    parentId : ObjectId | null;
     content: string;
     attachments?: IAttachment[];
     mentions?: ObjectId[];

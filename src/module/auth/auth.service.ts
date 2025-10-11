@@ -12,6 +12,7 @@ import { sendMail } from "../../utils";
 import { generateOtp, generateOtpExpiry } from "../../utils";
 import { compareHash } from "../../utils";
 import { generateToken } from "../../utils";
+import { generateHash } from "../../utils";
 class AuthService {
   // Define your authentication-related methods here
   private userRepository = new UserRepository();
@@ -149,6 +150,22 @@ class AuthService {
       throw new ForbiddenException("invalid credentials");
     }
 
+    // if user has 2FA enabled, send OTP and ask client to verify
+    if (userExists.twoFactorEnabled) {
+      const otp = generateOtp();
+      const otpExpiresAt = generateOtpExpiry(10);
+      await this.userRepository.update({ _id: userExists._id }, { otp, otpExpiresAt });
+      // send mail
+      if (userExists.email) {
+        await sendMail({
+          to: userExists.email,
+          subject: "Your login OTP",
+          html: `<p>Your login code is: <strong>${otp}</strong></p>`,
+        });
+      }
+      return res.status(200).json({ message: "2FA code sent", success: true });
+    }
+
     const accessToken = generateToken(userExists._id, "1h");
     const refreshToken = generateToken(userExists._id, "7d");
 
@@ -160,6 +177,50 @@ class AuthService {
       success: true,
       data: payload,
     });
+  }
+
+  async changePassword(req: Request, res: Response, next: NextFunction) {
+    const { currentPassword, newPassword } = req.body as { currentPassword: string; newPassword: string };
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      throw new UnauthorizedException("User not authenticated");
+    }
+
+    const user = await this.userRepository.getOne({ _id: userId });
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    const isMatch = await compareHash(currentPassword, user.password as string);
+    if (!isMatch) {
+      throw new ForbiddenException("Current password is incorrect");
+    }
+
+    const hashed = await generateHash(newPassword);
+    await this.userRepository.update({ _id: userId }, { password: hashed });
+
+    return res.status(200).json({ message: "Password changed successfully", success: true });
+  }
+
+  async verifyLoginOtp(req: Request, res: Response, next: NextFunction) {
+    const { email, otp } = req.body as { email: string; otp: string };
+    const user = await this.userRepository.getOne({ email });
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    if (!user.otp || user.otp !== otp) {
+      throw new UnauthorizedException("Invalid OTP");
+    }
+    if (!user.otpExpiresAt || new Date(user.otpExpiresAt) < new Date()) {
+      throw new UnauthorizedException("OTP expired");
+    }
+
+    // clear otp and issue tokens
+    await this.userRepository.update({ _id: user._id }, { otp: null as any, otpExpiresAt: null as any });
+    const accessToken = generateToken(user._id, "1h");
+    const refreshToken = generateToken(user._id, "7d");
+    const payload = this.authFactory.loginResponse(accessToken, refreshToken);
+    return res.status(200).json({ message: "Login successful", success: true, data: payload });
   }
 }
 

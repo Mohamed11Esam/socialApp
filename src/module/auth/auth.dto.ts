@@ -18,3 +18,8 @@ export interface LoginDto {
     phone?: string;
     password: string;
 }
+
+export interface ChangePasswordDto {
+    currentPassword: string;
+    newPassword: string;
+}

@@ -51,3 +51,13 @@ export const loginSchema = z
 export const resendOtpSchema = z.object({
   email: z.email("Invalid email address") as unknown as string,
 });
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(6, "Current password must be at least 6 characters"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+});
+
+export const verifyLoginOtpSchema = z.object({
+  email: z.string().email(),
+  otp: z.string().min(4),
+});

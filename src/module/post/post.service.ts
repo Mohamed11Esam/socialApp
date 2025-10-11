@@ -3,6 +3,7 @@ import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
 import { PostRepository } from "../../DB";
 import { NotFoundException, REACTIONS } from "../../utils";
+import { addReactionProvider } from "../../utils/providers/react.provider";
 
 class PostService {
   private readonly postFactoryService = new PostFactoryService();
@@ -22,43 +23,10 @@ class PostService {
   };
 
   addReaction = async (req: Request, res: Response) => {
-    const { id } = req.params;
+        const { id } = req.params;
     const { reaction } = req.body;
     const userId = req.user._id;
-    const postExists = await this.postRepository.getOne({ _id: id });
-    if (!postExists) {
-      throw new NotFoundException("Post not found");
-    }
-    let userReactedIndex = postExists.reactions.findIndex((reaction) => {
-      return reaction.userId.toString() === userId.toString();
-    });
-    // If user already reacted -> update the existing reaction entry
-    if (userReactedIndex == -1) {
-      await this.postRepository.update({ _id: id }, {
-        $push: {
-          reactions: {
-            reaction: [null, undefined, ""].includes(reaction)
-              ? REACTIONS.LIKE
-              : reaction,
-            userId,
-          },
-        },
-      } as any);
-      return res.sendStatus(204);
-    } else if ([undefined, null, ""].includes(reaction)) {
-      {
-        await this.postRepository.update({ _id: id }, {
-          $pull: { reactions: postExists.reactions[userReactedIndex] },
-        } as any);
-        return res.sendStatus(204);
-      }
-    } else {
-      await this.postRepository.update(
-        { _id: id, "reactions.userId": userId },
-        { $set: { "reactions.$.reaction": reaction } } as any
-      );
-    }
-    // User hasn't reacted yet -> push a new reaction
+    await addReactionProvider(this.postRepository, id, userId, reaction);
 
     return res.sendStatus(204);
   };
@@ -90,6 +58,24 @@ class PostService {
         success: true,
       });
   };
+  deletePost = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const postExists = await this.postRepository.getOne({ _id: id });
+    if (!postExists) {
+      throw new NotFoundException("Post not found");
+    }
+    if (postExists.userId.toString() !== req.user._id.toString()) {
+      throw new NotFoundException("You are not allowed to delete this post");
+    }
+    await this.postRepository.delete({ _id: id });
+    res
+      .status(200)
+      .json({
+        message: "Post deleted successfully",
+        success: true,
+      });
+  };
+
 }
 
 export default new PostService();

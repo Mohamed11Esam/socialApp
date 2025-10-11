@@ -8,3 +8,8 @@ export interface UpdateUserDto {
   phone?: string;
   gender?: string;
 }
+
+export interface ChangeEmailDto {
+  newEmail: string;
+  currentPassword: string;
+}

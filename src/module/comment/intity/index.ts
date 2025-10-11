@@ -6,7 +6,7 @@ export class Comment{
 
     userId: ObjectId;
         postId: ObjectId;
-        parentIds : ObjectId[];
+        parentId : ObjectId | null;
         content: string;
         attachments?: IAttachment[];
         mentions?: ObjectId[];
