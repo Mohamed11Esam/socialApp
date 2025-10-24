@@ -7,6 +7,7 @@ import {
   getPostParamsSchema,
   createPostSchema,
   reactionSchema,
+  updatePostSchema,
 } from "./post.validation";
 import commentRouter from "../comment/comment.controller";
 
@@ -25,6 +26,14 @@ router.patch(
   isValid(reactionSchema),
   postService.addReaction
 );
+// update post (owner only)
+router.patch(
+  "/:id/update",
+  isAuthenticated,
+  isValidParams(getPostParamsSchema),
+  isValid(updatePostSchema),
+  postService.updatePost
+);
 router.get(
   "/:id",
   isAuthenticated,
@@ -36,5 +45,17 @@ router.delete(
   isAuthenticated,
   isValidParams(getPostParamsSchema),
   postService.deletePost
+);
+router.patch(
+  "/:id/freeze",
+  isAuthenticated,
+  isValidParams(getPostParamsSchema),
+  postService.freezePost
+);
+router.patch(
+  "/:id/unfreeze",
+  isAuthenticated,
+  isValidParams(getPostParamsSchema),
+  postService.unFreezePost
 );
 export default router;

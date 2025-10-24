@@ -45,6 +45,10 @@ export const userSchema = new Schema<IUser>(
     isVerified: { type: Boolean, default: false },
     accessToken: { type: String },
     refreshToken: { type: String },
+    blockedUsers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    friendRequestsSent: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    friendRequestsReceived: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   {
     timestamps: true,

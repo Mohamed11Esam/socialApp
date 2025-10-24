@@ -16,6 +16,7 @@ export const postSchema = new Schema<IPost>({
 },
     reactions: [reactionSchema],
     attachments: [{ type: Schema.Types.ObjectId, ref: "Attachment" }],
+    isFrozen: { type: Boolean, default: false },
 },{ timestamps: true  , toJSON: { virtuals: true }, toObject: { virtuals: true }});
 
 postSchema.virtual('comments', {

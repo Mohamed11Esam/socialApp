@@ -13,6 +13,22 @@ export const updateProfileSchema = z.object({
   gender: z.string().optional(),
 });
 
+// Params schema for blocking/unblocking a user
+export const blockUserParamsSchema = z.object({
+  userId: z
+    .string()
+    .min(1)
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid user ID format"),
+});
+
+// Param schema for friend operations (same shape)
+export const friendUserParamsSchema = z.object({
+  userId: z
+    .string()
+    .min(1)
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid user ID format"),
+});
+
 export const toggle2FASchema = z.object({
   enable: z.boolean(),
   password: z.string().optional(),

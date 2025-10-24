@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { isAuthenticated } from "../../middlewares/auth.middleware";
 import commentService from "./comment.service";
-import { commentParamsSchema, createCommentSchema } from "./comment.validation";
+import {
+  commentParamsSchema,
+  createCommentSchema,
+  updateCommentSchema,
+} from "./comment.validation";
 import { isValidParams } from "../../middlewares/param-validation.middleware";
 import { isValid } from "../../middlewares/vaildation.middleware";
 
@@ -26,6 +30,30 @@ router.get(
   isAuthenticated,
   isValidParams(commentParamsSchema),
   commentService.getSpecific
+);
+
+// Freeze / unfreeze comment (only comment owner can do this)
+router.patch(
+  "/:id/freeze",
+  isAuthenticated,
+  isValidParams(commentParamsSchema),
+  commentService.freezeComment
+);
+
+router.patch(
+  "/:id/unfreeze",
+  isAuthenticated,
+  isValidParams(commentParamsSchema),
+  commentService.unFreezeComment
+);
+
+// update comment (nested)
+router.patch(
+  "/:id",
+  isAuthenticated,
+  isValidParams(commentParamsSchema),
+  isValid(updateCommentSchema),
+  commentService.updateComment
 );
 
 export default router;

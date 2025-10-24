@@ -19,6 +19,19 @@ export const createPostSchema = z
     { message: "Either content or attachments is required" }
   );
 
+// Schema for updating a post - at least one of content or attachments
+export const updatePostSchema = z
+  .object({
+    content: z.string().optional(),
+    attachments: z.array(z.any()).optional(),
+  })
+  .refine(
+    (data) => data.content || (data.attachments && data.attachments.length > 0),
+    {
+      message: "Either content or attachments is required",
+    }
+  );
+
 // Reaction body validation: allow empty/undefined to mean remove reaction, or a non-empty string
 export const reactionSchema = z.object({
   reaction: z.string().optional(),

@@ -6,6 +6,11 @@ export const createCommentSchema = z.object({
   attachments: z.array(z.any()).optional(),
 });
 
+export const updateCommentSchema = z.object({
+  content: z.string().optional(),
+  attachments: z.array(z.any()).optional(),
+});
+
 // Params schema to validate optional comment id and required postId (postId comes from parent router)
 export const commentParamsSchema = z.object({
   id: z

@@ -29,4 +29,19 @@ router.patch(
   CommentService.addreaction
 );
 
+// Freeze / unfreeze (top-level) - only comment owner can perform
+router.patch(
+  "/:id/freeze",
+  isAuthenticated,
+  isValidParams(commentIdParamsSchema),
+  CommentService.freezeComment
+);
+
+router.patch(
+  "/:id/unfreeze",
+  isAuthenticated,
+  isValidParams(commentIdParamsSchema),
+  CommentService.unFreezeComment
+);
+
 export default router;

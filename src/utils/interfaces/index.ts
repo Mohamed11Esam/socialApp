@@ -20,6 +20,10 @@ export interface IUser {
   isVerified?: boolean;
   accessToken?: string;
   refreshToken?: string;
+  blockedUsers?: ObjectId[];
+  friends?: ObjectId[];
+  friendRequestsSent?: ObjectId[];
+  friendRequestsReceived?: ObjectId[];
 }
 export interface Ipayload extends JwtPayload {
   _id: string;
@@ -43,6 +47,7 @@ export interface IPost {
   reactions: IReaction[];
   attachments?: IAttachment[];
   comments?: IComment[];
+  isFrozen: boolean;
 }
 export interface IComment {
   _id: ObjectId;
@@ -67,4 +72,5 @@ export interface IComment {
   attachments?: IAttachment[];
   mentions?: ObjectId[];
   reactions?: IReaction[];
+  isFrozen?: boolean;
 }
