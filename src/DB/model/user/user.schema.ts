@@ -49,6 +49,8 @@ export const userSchema = new Schema<IUser>(
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
     friendRequestsSent: [{ type: Schema.Types.ObjectId, ref: "User" }],
     friendRequestsReceived: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    isOnline: { type: Boolean, default: false },
+    lastSeen: { type: Date, default: Date.now },
   },
   {
     timestamps: true,

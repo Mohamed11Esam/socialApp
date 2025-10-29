@@ -16,8 +16,8 @@ import { isAuthenticated } from "../../middlewares/auth.middleware";
 const router = Router();
 
 router.get(
-  "/profile/:userId",
-  isValidParams(getUserProfileSchema),
+  "/profile",
+  isAuthenticated,
   asyncHandler(UserService.getUserProfile)
 );
 
@@ -72,6 +72,12 @@ router.delete(
 );
 
 router.get("/friends", isAuthenticated, asyncHandler(UserService.getFriends));
+
+router.get(
+  "/friends/online",
+  isAuthenticated,
+  asyncHandler(UserService.getOnlineFriends)
+);
 
 router.patch(
   "/email",

@@ -17,15 +17,24 @@ class UserService {
 
   getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
     // Logic to retrieve user profile by userId
-    let user = await this.userRepository.getOne(
-      { _id: req.params.userId },
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      throw new NotFoundException("User not authenticated");
+    }
+    // Fetch user with populated friends list
+    const user = await this.userRepository.getOne(
+      { _id: userId },
       {},
-      {}
+      {
+        populate: [
+          { path: "friends", select: "fullName firstName lastName email" },
+        ],
+      }
     );
     if (!user) {
       throw new NotFoundException("User not found");
     }
-    return res.status(200).json({ user, success: true });
+    return res.status(200).json({ data: { user }, success: true });
   };
 
   updateProfile = async (req: Request, res: Response, next: NextFunction) => {
@@ -149,13 +158,35 @@ class UserService {
         ],
       }
     );
-    return res
-      .status(200)
-      .json({
-        message: "Friends retrieved",
-        data: (user as any).friends || [],
-        success: true,
-      });
+    return res.status(200).json({
+      message: "Friends retrieved",
+      data: (user as any).friends || [],
+      success: true,
+    });
+  };
+
+  // Get online friends list for authenticated user
+  getOnlineFriends = async (req: Request, res: Response) => {
+    const userId = req.user && req.user._id;
+    if (!userId) throw new NotFoundException("User not authenticated");
+    const user = await this.userRepository.getOne(
+      { _id: userId },
+      {},
+      {
+        populate: [
+          {
+            path: "friends",
+            select: "fullName firstName lastName email isOnline lastSeen",
+            match: { isOnline: true },
+          },
+        ],
+      }
+    );
+    return res.status(200).json({
+      message: "Online friends retrieved",
+      data: (user as any).friends || [],
+      success: true,
+    });
   };
 
   toggleTwoFactor = async (req: Request, res: Response, next: NextFunction) => {

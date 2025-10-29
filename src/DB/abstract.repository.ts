@@ -1,4 +1,4 @@
-import { Model, ProjectionType, QueryOptions, RootFilterQuery } from "mongoose";
+import { Document, Model, ProjectionType, QueryOptions, RootFilterQuery } from "mongoose";
 
 export abstract class AbstractRepository<T> {
   protected model: Model<T>;
@@ -9,7 +9,7 @@ export abstract class AbstractRepository<T> {
 
   async create(data: Partial<T>){
     const doc = new this.model(data);
-    return await doc.save();
+    return await doc.save() as Document<T>;
   }
 
   async getOne(filter: RootFilterQuery<T>,projection?:ProjectionType<T>,Options?:QueryOptions<T>) {

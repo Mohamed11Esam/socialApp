@@ -24,6 +24,8 @@ export interface IUser {
   friends?: ObjectId[];
   friendRequestsSent?: ObjectId[];
   friendRequestsReceived?: ObjectId[];
+  isOnline?: boolean;
+  lastSeen?: Date;
 }
 export interface Ipayload extends JwtPayload {
   _id: string;
@@ -73,4 +75,14 @@ export interface IComment {
   mentions?: ObjectId[];
   reactions?: IReaction[];
   isFrozen?: boolean;
+}
+
+export interface IMessage {
+  sender: ObjectId;
+  content: string;
+}
+
+export interface IChat {
+  users: ObjectId[];
+  messages: IMessage[];
 }
